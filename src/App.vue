@@ -1,8 +1,8 @@
 <template>
   <nav>
-  <RouterLink :to="{name: 'Home'}">Home</RouterLink>|
-  <RouterLink :to="{name: 'About'}">About</RouterLink>|
-  <RouterLink :to="{name: 'Members'}">Members</RouterLink>
+  <RouterLink to="/">Home</RouterLink>|
+  <RouterLink to="/members">Members</RouterLink>|
+  <RouterLink to="/about">About</RouterLink>
 </nav>
 
   <br>

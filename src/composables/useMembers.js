@@ -1,40 +1,72 @@
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
- export function useMembers() {
- 	const members = ref([])
+export function useMembers() {
+  const members = ref([])
 
- 	function addMember(member) {
-     	members.value.push(member)
- 	}
+  onMounted(() => {
+    const savedRecords = localStorage.getItem('members')
 
- 	function removeMember(id) {
-     	members.value = members.value.filter(
-         	record => record.id !== id
-     	)
- 	}
-
-    function markAsActive(id) {
-        const member = members.value.find(record => record.id === id)
-        if (member) {
-            member.active = true
-        }
+    if (savedRecords) {
+      try {
+        members.value = JSON.parse(savedRecords)
+      } catch (error) {
+        console.error('Error loading members:', error)
+        members.value = []
+      }
     }
-    
-    onMounted(()=>{
-        const savedRecords = localStorage.getItem('members')
-        if(savedRecords){
-            members.value = JSON.parse(savedRecords)
-        }
+  })
+
+  function addMember(member) {
+    members.value.push({
+      id: Date.now(),
+      name: member.name,
+      email: member.email,
+      role: member.role,
+      joinDate: member.joinDate,
+      active: false
     })
+  }
 
-    watch(members, (newMembers) => {
-        localStorage.setItem('members', JSON.stringify(newMembers))
-    }, { deep: true })
+  function markActive(id) {
+    const member = members.value.find(
+      member => member.id === id
+    )
 
- 	return {
-     	members,
-     	addMember,
-     	removeMember,
-     	markAsActive
- 	}
- }
+    if (member) {
+      member.active = true
+    }
+  }
+
+  function deleteMember(id) {
+    members.value = members.value.filter(
+      member => member.id !== id
+    )
+  }
+
+  const activeMembers = computed(() => {
+    return members.value.filter(
+      member => member.active
+    )
+  })
+
+  watch(
+    members,
+    newMembers => {
+      localStorage.setItem(
+        'members',
+        JSON.stringify(newMembers)
+      )
+    },
+    {
+      deep: true
+    }
+  )
+
+  return {
+    members,
+    activeMembers,
+    addMember,
+    markActive,
+    deleteMember
+  }
+}

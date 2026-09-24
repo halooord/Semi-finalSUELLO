@@ -1,102 +1,99 @@
-<template>
-    <div class="form-container">
-        <h2>Add New Member</h2>
-
-                    <form @submit.prevent="submitForm">
-                        <div class="form-group">
-                            <label class="form-label fw-semibold">
-                                Full Name
-                            </label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                v-model="fullName"
-                                placeholder="Enter your full name"
-                                required
-                                >
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label fw-semibold">
-                                Email
-                            </label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                v-model="email"
-                                placeholder="Enter your full email"
-                                required
-                                >
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label fw-semibold">
-                                clubRole
-                            </label>
-                            <select
-                                class="form-select"
-                                v-model="clubRole"
-                                required
-                                >
-                                <option value="">Select your Role</option>
-                                <option value="Member">Member</option>
-                                <option value="Officer">Officer</option>
-                                <option value="Treasurer">Treasurer</option>
-                                <option value="President">President</option>
-                                
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label fw-semibold">
-                                Join Date
-                            </label>
-                            <input
-                                type="date"
-                                class="form-control"
-                                v-model="joinDate"
-                                placeholder="Enter your joinDate number"
-                                required
-                                >
-                        </div>
-                        <button type="submit" class="add-button">
-                         Add Member
-                        </button>
-                    </form>
-                </div>
-</template>
 <script setup>
-import {ref, reactive} from 'vue'
+import { reactive, ref } from 'vue'
 
 const emit = defineEmits(['member-added'])
 
 const form = reactive({
-    fullName: '',
-    email: '',
-    clubRole: '',
-    joinDate: ''
+  name: '',
+  email: '',
+  role: 'Member',
+  joinDate: ''
 })
 
 const errorMessage = ref('')
 
 function submitForm() {
-    if (
-        !form.fullName ||!form.email || !form.clubRole || !form.joinDate) {
-        errorMessage.value = 'Please fill in all fields.'
-        return
-    }
-}
+  errorMessage.value = ''
 
-const newMember ={
-    id: Date.now(),
-    fullName: form.fullName,
-    email: form.email,
-    clubRole: form.clubRole,
-    joinDate: form.joinDate,
-    status: 'Pending'
-}
+  if (
+    !form.name.trim() ||
+    !form.email.trim() ||
+    !form.role ||
+    !form.joinDate
+  ) {
+    errorMessage.value =
+      'Please fill in all required fields.'
 
-emit('member-added', newMember)
-form.fullName = ''
-form.email = ''
-form.clubRole = ''
-form.joinDate = ''
-errorMessage.value = ''
+    return
+  }
+
+  emit('member-added', {
+    name: form.name.trim(),
+    email: form.email.trim(),
+    role: form.role,
+    joinDate: form.joinDate
+  })
+
+  form.name = ''
+  form.email = ''
+  form.role = 'Member'
+  form.joinDate = ''
+}
 </script>
+
+<template>
+  <div class="form-container">
+    <h2>Add Member</h2>
+
+    <form @submit.prevent="submitForm">
+      <div class="form-group">
+        <label>Member Name</label>
+
+        <input
+          v-model="form.name"
+          type="text"
+          placeholder="Enter name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+
+        <input
+          v-model="form.email"
+          type="email"
+          placeholder="Enter email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Club Role</label>
+
+        <select v-model="form.role">
+          <option value="Member">Member</option>
+          <option value="Officer">Officer</option>
+          <option value="Treasurer">Treasurer</option>
+          <option value="President">President</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Join Date</label>
+
+        <input
+          v-model="form.joinDate"
+          type="date"
+        />
+      </div>
+
+      <p v-if="errorMessage" class="error">
+        {{ errorMessage }}
+      </p>
+
+      <button type="submit">
+        Add Member
+      </button>
+    </form>
+  </div>
+</template>
+
